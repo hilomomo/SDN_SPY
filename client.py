@@ -74,9 +74,15 @@ send_udp(pkt)
 print "change dst IP"
 pkt = Ether(dst=mac_dst) / IP(dst=get_random_ip()) / UDP(sport=9250, dport=9250) / get_data("D5")
 send_udp(pkt)
+#以DST_IP为匹配域的控制器收不到这个包
 
 print "change src MAC"
-pkt = Ether(src=get_random_mac(), dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=9250) / get_data("D6")
+rd_mac = get_random_mac()
+os.system("ip link set h2-eth0 address " + mac)
+os.system("arp -s " + ip_dst + " " + mac_dst)
+pre_pkt = Ether(src=rd_mac) / IP(dst=10.0.0.10) / ICMP()
+sendp(pre_pkt)
+pkt = Ether(src=rd_mac, dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=9250) / get_data("D6")
 send_udp(pkt)
 
 pkt = Ether(dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=9250) / "SDN_SPY_exit"
