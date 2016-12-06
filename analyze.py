@@ -18,7 +18,7 @@ for i in range(0, len(server_pacp)):
         server_time.append(packet.time)
 
 print "%10s%15s%15s%15s%15s" % ("FIELD", "P1_SEND", "P1_RECV", "P2_SEND", "P2_RECV")
-if len(client_time) == len(server_time):
+if len(client_time) == len(server_time) == 24:
     for i in range(0, len(client_time), 4):
         print "%10s%15.2f%15.2f%15.2f%15.2f" % (
             (title_dict[i / 4]), (server_time[i] - client_time[i]) * 100000000,
