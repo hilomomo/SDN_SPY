@@ -53,24 +53,24 @@ mac_dst = "00:00:00:00:00:01"
 
 os.system("tcpdump -t udp -w ./client.pcap&>/dev/null")
 
-pkt = Ether(dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=9250) / "SDN_SPY_start"
+pkt = Ether(src=mac_src, st=mac_dst) / IP(src=ip_src, dst=ip_dst) / UDP(sport=9250, dport=9250) / "SDN_SPY_start"
 sendp(pkt)
 time.sleep(1)
 
 print "change dst port"
-pkt = Ether(dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=get_random_port()) / get_data("D1")
+pkt = Ether(src=mac_src, dst=mac_dst) / IP(src=ip_src, dst=ip_dst) / UDP(sport=9250, dport=get_random_port()) / get_data("D1")
 send_udp(pkt)
 
 print "change src port"
-pkt = Ether(dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=get_random_port(), dport=9250) / get_data("D2")
+pkt = Ether(src=mac_src, dst=mac_dst) / IP(src=ip_src, dst=ip_dst) / UDP(sport=get_random_port(), dport=9250) / get_data("D2")
 send_udp(pkt)
 
 print "change ToS bits"
-pkt = Ether(dst=mac_dst) / IP(dst=ip_dst, tos=get_random_tos()) / UDP(sport=9250, dport=9250) / get_data("D3")
+pkt = Ether(src=mac_src, dst=mac_dst) / IP(src=ip_src, dst=ip_dst, tos=get_random_tos()) / UDP(sport=9250, dport=9250) / get_data("D3")
 send_udp(pkt)
 
 print "change src IP"
-pkt = Ether(dst=mac_dst) / IP(src=get_random_ip(), dst=ip_dst) / UDP(sport=9250, dport=9250) / get_data("D4")
+pkt = Ether(src=mac_src, dst=mac_dst) / IP(src=get_random_ip(), dst=ip_dst) / UDP(sport=9250, dport=9250) / get_data("D4")
 send_udp(pkt)
 
 print "change dst IP"
@@ -82,10 +82,10 @@ rd_mac = get_random_mac()
 os.system("ip link set h2-eth0 address " + rd_mac)
 os.system("arp -s " + ip_dst + " " + mac_dst)
 #make RYU record mac-port
-pre_pkt = Ether(src=rd_mac) / IP(dst="10.0.0.10") / ICMP()
+pre_pkt = Ether(src=rd_mac) / IP(src=ip_src, dst="10.0.0.10") / ICMP()
 sendp(pre_pkt)
 time.sleep(1)
-pkt = Ether(src=rd_mac, dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=9250) / get_data("D6")
+pkt = Ether(src=rd_mac, dst=mac_dst) / IP(src=ip_src, dst=ip_dst) / UDP(sport=9250, dport=9250) / get_data("D6")
 send_udp(pkt)
 
 pkt = Ether(dst=mac_dst) / IP(dst=ip_dst) / UDP(sport=9250, dport=9250) / "SDN_SPY_exit"
